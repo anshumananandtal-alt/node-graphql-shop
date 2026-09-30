@@ -1,0 +1,45 @@
+{
+  "name": "nodejs-complete-guide",
+  "version": "1.0.0",
+  "description": "Complete Node.js Guide",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r dotenv/config app.js",
+    "start-server": "node app.js",
+    "start:dev": "nodemon  -r dotenv/config  app.js"
+  },
+  "author": "Maximilian Schwarzmüller",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "nodemon": "^1.18.3"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^1.18.3",
+    "compression": "^1.8.2",
+    "connect-flash": "^0.1.1",
+    "connect-mongodb-session": "^2.0.3",
+    "csurf": "^1.11.0",
+    "dotenv": "^18.0.4",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.15.6",
+    "express-validator": "^7.3.2",
+    "helmet": "^8.3.0",
+    "mongodb": "^3.1.6",
+    "mongoose": "^5.2.17",
+    "morgan": "^1.12.1",
+    "multer": "^2.4.0",
+    "mysql2": "^1.6.1",
+    "nodemailer": "^10.0.10",
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "pdfkit": "^0.20.2",
+    "pug": "^2.0.3",
+    "sequelize": "^5.0.0-beta.11",
+    "stripe": "^22.6.2"
+  }
+}
