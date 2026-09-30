@@ -27,7 +27,7 @@
                     <button type="button" class="btn" id="order-button">Order Now!</button>
                     <script src="https://js.stripe.com/v3/"></script>
                     <script>
-                        var stripe = Stripe("<%= public_key %>")
+                        var stripe = Stripe("<%= publicKey %>")
                         var orderBtn = document.getElementById('order-button')
                         orderBtn.addEventListener('click', function() {
                             stripe.redirectToCheckout({

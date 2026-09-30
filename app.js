@@ -27,7 +27,28 @@ const store = new MongoDBStore({
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-app.use(helmet())
+app.use(helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: [
+                    "'self'",
+                    "'unsafe-inline'",
+                    "https://js.stripe.com"
+                ],
+                frameSrc: [
+                    "'self'",
+                    "https://js.stripe.com",
+                    "https://hooks.stripe.com"
+                ],
+                connectSrc: [
+                    "'self'",
+                    "https://api.stripe.com",
+                    "https://checkout.stripe.com"
+                ]
+            }
+        }
+    }))
 app.use(compression())
 app.use(morgan('combined', { stream: fs.createWriteStream(path.join(__dirname, "server.log"), { flags: 'a'})} ))
 const fileStorage = multer.diskStorage({

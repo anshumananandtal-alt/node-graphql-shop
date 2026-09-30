@@ -143,11 +143,12 @@ exports.getCheckout  = (req, res, next) => {
         cancel_url: `${req.protocol}://${req.get('host')}/checkout/cancel`
       })
     }).then(session =>{
+      console.log('#session', session, process.env.S)
       res.render('shop/checkout', {
         path: '/checkout',
         pageTitle: 'Your Checkout',
         products: products,
-        public_key: process.env.STRIPE_PUBLIC_KEY,
+        publicKey: process.env.STRIPE_PUBLIC_KEY,
         totalPrice,
         isAuthenticated: req.session.isLoggedIn,
         sessionId: session.id
