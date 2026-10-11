@@ -146,6 +146,7 @@ app.use('/graphql', graphqlHTTP({
         return { message: message, status: code, data: data };
     } 
 }));
+app.use(shopRoutes);
 
 app.use(csrfProection);
 
@@ -181,7 +182,6 @@ app.use((req, res, next) => {
 });
 
 app.use(flash());
-app.use(shopRoutes);
 
 // 404 handler
 app.use(errorController.get404);

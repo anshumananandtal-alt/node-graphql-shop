@@ -6,6 +6,7 @@ const shopController = require('../controllers/shop');
 
 const router = express.Router();
 
+router.post('/post-image', isProtectedRoute, shopController.postImage)
 router.get('/order/:orderId', isProtectedRoute, shopController.getInvoice);
 
 

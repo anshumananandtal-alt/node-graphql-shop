@@ -1,6 +1,9 @@
 const Product = require('../../models/product')
 const User = require('../../models/user')
+const path = require('path')
+const rootDir = require('../../util/path')
 const validator = require('validator')
+const { deleteFile } = require('../../util/helper')
 const PER_PAGE = 2
 module.exports = {
     product: async ({ _id }, req) =>{
@@ -161,6 +164,8 @@ module.exports = {
                     }
                 }
             );
+            const fileLocation = path.join(rootDir, product.imageUrl)
+            deleteFile(fileLocation)
             return {
                 message: 'Successfully deleted product',
                 status: 200       

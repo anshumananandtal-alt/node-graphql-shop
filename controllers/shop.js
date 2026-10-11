@@ -2,7 +2,8 @@ const path = require('path')
 const fs = require('fs')
 const rootDir = require('../util/path')
 const Order = require('../models/order');
-const PdfDocument = require('pdfkit')
+const PdfDocument = require('pdfkit');
+const { deleteFile } = require('../util/helper');
 
 
 exports.getInvoice = (req, res, next) =>{
@@ -52,4 +53,20 @@ exports.getInvoice = (req, res, next) =>{
   })
   .catch(err => next(err))
  
+}
+
+exports.postImage = (req, res, next)=>{
+  if(!req.file){
+    const error = new Error('Image file is invalid')
+    error.status = 422
+    throw error
+  }
+  if(req.body.imageUrl){
+    const fileLocation = path.join(rootDir, req.body.imageUrl)
+    deleteFile(fileLocation)
+  }
+  res.status(201).json({
+    imageUrl: req.file.path.replace('\\','/'),
+    message: "Image uploaded successfully"
+  })
 }
