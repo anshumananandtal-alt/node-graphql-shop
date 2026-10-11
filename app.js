@@ -1,3 +1,4 @@
+const config = require('dotenv').config({ quiet: true})
 const path = require('path');
 const fs = require('fs')
 const https = require('https')
@@ -19,6 +20,9 @@ const FILE_REGEX = /^image\/(png|jpe?g|webp)$/;
 const MONGODB_URI =
   `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@node.3l7dvs8.mongodb.net/${process.env.DEFAULT_DATABASE}`;
 const csrfProection = csrf();
+const { graphqlHTTP } = require('express-graphql');
+const schema  = require('./graphql/schema');
+const rootValue = require('./graphql/resolver');
 const app = express();
 const store = new MongoDBStore({
   uri: MONGODB_URI,
@@ -27,30 +31,30 @@ const store = new MongoDBStore({
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-app.use(helmet({
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: [
-                    "'self'",
-                    "'unsafe-inline'",
-                    "https://js.stripe.com"
-                ],
-                frameSrc: [
-                    "'self'",
-                    "https://js.stripe.com",
-                    "https://hooks.stripe.com"
-                ],
-                connectSrc: [
-                    "'self'",
-                    "https://api.stripe.com",
-                    "https://checkout.stripe.com"
-                ]
-            }
-        }
-    }))
-app.use(compression())
-app.use(morgan('combined', { stream: fs.createWriteStream(path.join(__dirname, "server.log"), { flags: 'a'})} ))
+// app.use(helmet({
+//         contentSecurityPolicy: {
+//             directives: {
+//                 defaultSrc: ["'self'"],
+//                 scriptSrc: [
+//                     "'self'",
+//                     "'unsafe-inline'",
+//                     "https://js.stripe.com"
+//                 ],
+//                 frameSrc: [
+//                     "'self'",
+//                     "https://js.stripe.com",
+//                     "https://hooks.stripe.com"
+//                 ],
+//                 connectSrc: [
+//                     "'self'",
+//                     "https://api.stripe.com",
+//                     "https://checkout.stripe.com"
+//                 ]
+//             }
+//         }
+//     }))
+// app.use(compression())
+// app.use(morgan('combined', { stream: fs.createWriteStream(path.join(__dirname, "server.log"), { flags: 'a'})} ))
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb)=>{
     return cb(null, 'images')
@@ -69,12 +73,10 @@ const fileFilter = (req, file, cb) => {
   return cb(null, false);
 };
 
-const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const authRoutes = require('./routes/auth');
 const { Stream } = require('nodemailer/lib/xoauth2');
-app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images',express.static(path.join(__dirname, 'images')));
 
@@ -86,14 +88,64 @@ app.use(
   }).single('image')
 );
 
+app.use((req, res, next) => {
+    res.setHeader(
+        'Access-Control-Allow-Origin',
+        'http://localhost:5173'
+    );
+
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    );
+
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization'
+    );
+
+    res.setHeader(
+        'Access-Control-Allow-Credentials',
+        'true'
+    );
+
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
+
 app.use(
-  session({
-    secret: 'my secret',
-    resave: false,
-    saveUninitialized: false,
-    store: store
-  })
+    session({
+        secret: 'my secret',
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+        cookie: {
+            maxAge: 1000 * 60 * 60,
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax'
+        }
+    })
 );
+
+
+app.use('/graphql', graphqlHTTP({
+  schema: schema,
+  rootValue: rootValue,
+  graphiql: true,
+  customFormatErrorFn: (err) => { 
+        if(!err.originalError) {
+            return err;
+        }
+        const data = err.originalError.data;
+        const message = err.message || 'An error occurred.';
+        const code = err.originalError.code || 500;
+        return { message: message, status: code, data: data };
+    } 
+}));
 
 app.use(csrfProection);
 
@@ -129,10 +181,7 @@ app.use((req, res, next) => {
 });
 
 app.use(flash());
-
-app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(authRoutes);
 
 // 404 handler
 app.use(errorController.get404);
