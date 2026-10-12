@@ -155,14 +155,22 @@ module.exports = {
         try{
             const deleteResult = await Product.findByIdAndDelete(_id)
             const deleteFromUserCart = await User.updateMany(
-                { 'cart.items.productId': _id },
+                {         
+                    $or: [
+                        { 'cart.items.productId': _id },
+                        { 'favourite.items.productId': _id }
+                    ]
+                },
                 {
                     $pull: {
                         'cart.items': {
                             productId: _id
+                        },
+                        'favourite.items': {
+                               productId: _id
                         }
                     }
-                }
+                } 
             );
             const fileLocation = path.join(rootDir, product.imageUrl)
             deleteFile(fileLocation)

@@ -56,7 +56,7 @@ exports.getInvoice = (req, res, next) =>{
 }
 
 exports.postImage = (req, res, next)=>{
-  if(!req.file){
+  if(!req.file){ 
     const error = new Error('Image file is invalid')
     error.status = 422
     throw error

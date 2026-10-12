@@ -49,7 +49,8 @@ module.exports = {
                 await req.session.save()
                 return {
                     token: req.session.id,
-                    userId: userDoc._id.toString()
+                    userId: userDoc._id.toString(),
+                    role: user.role
                 }
             }else{
                 const error = new Error('Invalid email or password')
@@ -108,6 +109,7 @@ module.exports = {
         return {
             token: req.session.id,
             userId: result._id.toString(),
+            role: result.role,
             message: 'User created successfully.'
         }
     },
@@ -144,7 +146,7 @@ module.exports = {
         const token = await Crypto.randomBytes(32).toString('hex')
         user.resetToken = token
         user.resetTokenExpTime = await new Date().getTime() + 3600000
-        await user.save()
+        await user.save() 
         try{
             const info = await transporter.sendMail({
                 to: user.email,

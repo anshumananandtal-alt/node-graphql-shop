@@ -2,16 +2,19 @@ module.exports = `
     type PostLoginData {
         token: String!
         userId: String!
+        role: String!
     }
     type PostSignupData {
         token: String!
         userId: String!
+        role: String!
     }
     
     type userData {
         _id: ID!
         email: String!
         name: String!
+        role: String!
     }
 
 

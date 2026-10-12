@@ -3,6 +3,7 @@ const userSchema = require('./auth')
 const productSchema = require('./product')
 const cartSchema = require('./cart')
 const orderSchema = require('./order')
+const favouriteSchema = require('./favourite')
 
 const schema = buildSchema(`  
     type query {
@@ -15,6 +16,7 @@ const schema = buildSchema(`
     ${productSchema}
     ${cartSchema}
     ${orderSchema}
+    ${favouriteSchema}
     schema {
         query: query
         mutation: mutation
