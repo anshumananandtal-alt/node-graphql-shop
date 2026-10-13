@@ -4,6 +4,7 @@ const path = require('path')
 const rootDir = require('../../util/path')
 const validator = require('validator')
 const { deleteFile } = require('../../util/helper')
+const {deleteImage} = require('../../util/awsService')
 const PER_PAGE = 2
 module.exports = {
     product: async ({ _id }, req) =>{
@@ -154,6 +155,7 @@ module.exports = {
         }
         try{
             const deleteResult = await Product.findByIdAndDelete(_id)
+            const deleteImageResult = await deleteImage(product.imageUrl)
             const deleteFromUserCart = await User.updateMany(
                 {         
                     $or: [
@@ -172,8 +174,8 @@ module.exports = {
                     }
                 } 
             );
-            const fileLocation = path.join(rootDir, product.imageUrl)
-            deleteFile(fileLocation)
+            // const fileLocation = path.join(rootDir, product.imageUrl)
+            // deleteFile(fileLocation)
             return {
                 message: 'Successfully deleted product',
                 status: 200       

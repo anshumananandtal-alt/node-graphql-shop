@@ -83,7 +83,7 @@ app.use('/images',express.static(path.join(__dirname, 'images')));
 
 app.use(
   multer({
-    storage: fileStorage,
+    storage: multer.memoryStorage(),
     fileFilter
   }).single('image')
 );

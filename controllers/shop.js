@@ -4,6 +4,7 @@ const rootDir = require('../util/path')
 const Order = require('../models/order');
 const PdfDocument = require('pdfkit');
 const { deleteFile } = require('../util/helper');
+const { postImage, deleteImage } = require('../util/awsService')
 
 
 exports.getInvoice = (req, res, next) =>{
@@ -55,18 +56,18 @@ exports.getInvoice = (req, res, next) =>{
  
 }
 
-exports.postImage = (req, res, next)=>{
+exports.postImage = async (req, res, next)=>{
   if(!req.file){ 
     const error = new Error('Image file is invalid')
     error.status = 422
     throw error
   }
   if(req.body.imageUrl){
-    const fileLocation = path.join(rootDir, req.body.imageUrl)
-    deleteFile(fileLocation)
+    const deleteImageResult = await deleteImage(req.body.imageUrl)
   }
+  const imageUrl = await postImage(req.file)
   res.status(201).json({
-    imageUrl: req.file.path.replace('\\','/'),
+    imageUrl: imageUrl,
     message: "Image uploaded successfully"
   })
 }
