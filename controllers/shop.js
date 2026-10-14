@@ -62,9 +62,9 @@ exports.postImage = async (req, res, next)=>{
     error.status = 422
     throw error
   }
-  if(req.body.imageUrl){
-    const deleteImageResult = await deleteImage(req.body.imageUrl)
-  }
+  // if(req.body.imageUrl){
+  //   const deleteImageResult = await deleteImage(req.body.imageUrl)
+  // }
   const imageUrl = await postImage(req.file)
   res.status(201).json({
     imageUrl: imageUrl,
